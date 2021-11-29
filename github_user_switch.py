@@ -20,7 +20,7 @@ def move_files(foldername):
 
 
 if __name__ == "__main__":
-    print("Choice which kind of github: FPC is 1, Private is 2: ")
+    print("Choice which kind of github: Company is 1, Private is 2: ")
     choice = int(input())
     if 1 == choice:
         move_files("FPC")
