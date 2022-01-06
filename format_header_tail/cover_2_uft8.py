@@ -38,10 +38,13 @@ def write_file(content, file):
 
 
 def convert_encode2utf8(file, original_encode, des_encode):
-    file_content = read_file(file)
-    file_decode = file_content.decode(original_encode,'ignore')
-    file_encode = file_decode.encode(des_encode)
-    write_file(file_encode, file)
+    try:
+        file_content = read_file(file)
+        file_decode = file_content.decode(original_encode, 'ignore')
+        file_encode = file_decode.encode(des_encode)
+        write_file(file_encode, file)
+    except TypeError as e:
+        print("{} raise error {}".format(file, e))
 
 
 def covert2utf8(Filelist):
@@ -52,7 +55,6 @@ def covert2utf8(Filelist):
         if encode_info != 'utf-8':
             convert_encode2utf8(filename, encode_info, 'utf-8')
         encode_info = get_encode_info(filename)
-        print(encode_info)
 
 
 # if __name__ == "__main__":

@@ -100,10 +100,9 @@ def checkFile(fileName):
     checkCopyright = isCopyrightOk(decodeData)
     failed_file = ''
     if not checkCopyright:
-        print("--------------------------------------------")
-        print(fileName + " fails the copyright check")
-        print("--------------------------------------------")
-        # sys.exit(1)
+        # print("--------------------------------------------")
+        # print(fileName + " fails the copyright check")
+        # print("--------------------------------------------")
         failed_file = fileName
     return failed_file
 
