@@ -40,9 +40,9 @@ def get_file_list(src):
     return h_file_list, c_file_list
 
 
-def check_header_exist():
+def check_header_exist(file_list):
     final_files = []
-    for fileName in h_file_list:
+    for fileName in file_list:
         try:
             with open(fileName, mode='r', encoding='UTF-8') as fr:
                 lines = fr.readlines()
@@ -104,8 +104,7 @@ def update_file_header(fileName):
             content = file_content[i]
         new_file_content.append(content)
     new_file_content = check_and_correct_tail(new_file_content)[0]
-
-    write2file(os.path.join(os.path.dirname(fileName), os.pardir, "new", os.path.basename(fileName)), new_file_content, True)
+    write2file(fileName, new_file_content, True)
 
 
 if __name__ == "__main__":
@@ -115,51 +114,52 @@ if __name__ == "__main__":
     print("1. Get all .h and .c file list...")
     h_file_list, c_file_list = get_file_list(path)
     print("-------------------------------")
-    # 目标文件转换为utf-8编码格式
-    print("2. Covert files to utf-8 encoding...")
-    covert2utf8(h_file_list)
-    print("-------------------------------")
-    # 检查文件是否有copyright，即只针对已有copyright的头文件做处理
-    print("3. Check if header is existed...")
-    final_files = check_header_exist()
-    write2file("final_files.txt", final_files)
-    print("-------------------------------")
+    for file_list in get_file_list(path):
+        # 目标文件转换为utf-8编码格式
+        print("2. Covert files to utf-8 encoding...")
+        covert2utf8(file_list)
+        print("-------------------------------")
+        # 检查文件是否有copyright，即只针对已有copyright的头文件做处理
+        print("3. Check if header is existed...")
+        final_files = check_header_exist(file_list)
+        write2file("final_files.txt", final_files)
+        print("-------------------------------")
 
-    # 挑选出copyright检查不否规格的文件
-    print("4. Filter out files that copyright checked is not correct...")
-    checked_failed_files = []
-    for fileName in final_files:
-        if checkFile(fileName) != '':
-            checked_failed_files.append(checkFile(fileName))
-    write2file("copyright_checked_failed_files.txt", checked_failed_files)
+        # 挑选出copyright检查不否规格的文件
+        print("4. Filter out files that copyright checked is not correct...")
+        checked_failed_files = []
+        for fileName in final_files:
+            if checkFile(fileName) != '':
+                checked_failed_files.append(checkFile(fileName))
+        write2file("copyright_checked_failed_files.txt", checked_failed_files)
 
-    print(len(checked_failed_files), checked_failed_files)
-    print("-------------------------------")
+        print(len(checked_failed_files), checked_failed_files)
+        print("-------------------------------")
 
-    # 把copyright检查fail的文件模板化
-    print("5. Format header copyright for copyright check failed files...")
-    filelist = []
-    for fileName in checked_failed_files:
-        update_file_header(fileName)
-    print(filelist)
-    print("-------------------------------")
+        # 把copyright检查fail的文件模板化
+        print("5. Format header copyright for copyright check failed files...")
+        filelist = []
+        for fileName in checked_failed_files:
+            update_file_header(fileName)
+        print(filelist)
+        print("-------------------------------")
 
-    # 检索出copyright没问题的文件
-    print("6. Get file that copyright is right, i.e. exclude check failed files")
-    checked_passed_files = []
-    for file in final_files:
-        if file not in checked_failed_files:
-            checked_passed_files.append(file)
-    write2file("copyright_checked_passed_files.txt", checked_passed_files)
-    print("Get the check passed files".format(checked_passed_files))
-    print("-------------------------------")
+        # 检索出copyright没问题的文件
+        print("6. Get file that copyright is right, i.e. exclude check failed files")
+        checked_passed_files = []
+        for file in final_files:
+            if file not in checked_failed_files:
+                checked_passed_files.append(file)
+        write2file("copyright_checked_passed_files.txt", checked_passed_files)
+        print("Get the check passed files".format(checked_passed_files))
+        print("-------------------------------")
 
-    # 针对copyright没有问题的文件，检查最未尾是否有且只有一行空行，不是则更新
-    print("7. For copyright passed file, to do check tail and correct...")
-    for fl in checked_passed_files:
-        fl_content = read_file(fl)
-        if check_and_correct_tail(fl_content)[1]:
-            update_file_header(fl)
-    print("-------------------------------")
+        # 针对copyright没有问题的文件，检查最未尾是否有且只有一行空行，不是则更新
+        print("7. For copyright passed file, to do check tail and correct...")
+        for fl in checked_passed_files:
+            fl_content = read_file(fl)
+            if check_and_correct_tail(fl_content)[1]:
+                update_file_header(fl)
+        print("-------------------------------")
 
-    print("Done")
+        print("Done")
