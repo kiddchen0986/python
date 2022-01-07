@@ -1,43 +1,8 @@
-import os
 from glob import glob
 from test_copyright_headers import *
-from cover_2_uft8 import *
-
-
-def read_file(file):
-    with open(file, 'r') as f:
-        return f.readlines()
-
-
-def write2file(file_name, lines, new_line=False):
-    with open(file_name, mode='w') as fw:
-        if new_line:
-            fw.writelines(lines)
-        else:
-            fw.writelines("\n".join(sorted(lines)))
-
-
-def create_files_txt(file_name, files):
-    print("{} file number: {} ".format(file_name[0], str(len(files))))
-    with open(file_name + ".txt", mode="w") as fw:
-        for file in sorted(files):
-            fw.write(file+"\n")
-
-
-def get_file_list(src):
-    h_file_list = []
-    c_file_list = []
-    for path, folders, _ in os.walk(src):
-        h_file_name = glob(os.path.join(path, "*.h"))
-        h_file_list.extend(h_file_name)
-
-        c_file_name = glob(os.path.join(path, "*.c"))
-        c_file_list.extend(c_file_name)
-
-    create_files_txt("h_file", h_file_list)
-    create_files_txt("c_file", c_file_list)
-
-    return h_file_list, c_file_list
+from filehandle.cover_2_uft8 import *
+from filehandle.get_file_list import *
+from filehandle.read_write_operator import *
 
 
 def check_header_exist(file_list):
@@ -71,26 +36,36 @@ def check_and_correct_tail(file_content):
     return [file_content, corrected]
 
 
-def update_file_header(fileName):
-    filelist.append(fileName)
-    pattern = "\* Copyright\s*\(c\) (20\d\d)?(-20\d\d)? Fingerprint Cards AB <tech@fingerprints.com>"
-    file_content = read_file(fileName)
+def get_year_content(file_content):
+    type1_flag, type2_flag = False, False
+    if str(file_content[0]).strip() != "//":
+        pattern = "\* Copyright\s*\(c\) (20\d\d)?(-20\d\d)? Fingerprint Cards AB <tech@fingerprints.com>"
+        type1_flag = True
+    else:
+        pattern = "// Copyright\s*\(c\) (20\d\d)?(-20\d\d)? Fingerprint Cards AB <tech@fingerprints.com>"
+        type2_flag = True
+
     for line, content in enumerate(file_content):
         if r"Fingerprint Cards AB <tech@fingerprints.com>" in content:
             year_line = line
-            year_content = re.findall(pattern, file_content[line].strip())
-        if r"*/" in content:
+            year_data = re.findall(pattern, file_content[line].strip())
+            if len(year_data) != 0 and len(year_data[0]) != 0:
+                if type1_flag:
+                    new_year_content = " * Copyright (c) {}-2022 Fingerprint Cards AB <tech@fingerprints.com>\n".format(
+                        year_data[0][0])
+                elif type2_flag:
+                    new_year_content = "// Copyright (c) {}-2022 Fingerprint Cards AB <tech@fingerprints.com>\n".format(
+                        year_data[0][0])
+            else:
+                sys.exit("Please manually check if the file {} is correct header\n".format(fileName))
+
+        if r"*/" in str(content).strip()[:3] or r"//" in str(content).strip()[:3]:
             header_end_line = line
             break
+    return new_year_content, year_line, header_end_line
 
-    if len(year_content[0]) != 0:
-        new_year_content = " * Copyright (c) {}-2022 Fingerprint Cards AB <tech@fingerprints.com>\n".format(
-            year_content[0][0])
-    else:
-        print("-------------------------")
-        print("Please manually check if the file is correct header\n {}".format(fileName))
-        print("-------------------------")
 
+def new_content_write_back(file_content, new_year_content, year_line, header_end_line):
     new_file_content = []
     for i in range(len(file_content)):
         if i <= header_end_line:
@@ -99,22 +74,41 @@ def update_file_header(fileName):
             elif i == year_line:
                 content = new_year_content
             else:
-                content = " " + file_content[i] if file_content[i][0] != " " else file_content[i]
+                if file_content[0].strip() == "//":
+                    content = file_content[i]
+                else:
+                    content = " " + file_content[i] if file_content[i][0] != " " else file_content[i]
         else:
             content = file_content[i]
         new_file_content.append(content)
+
+    return new_file_content
+
+
+def update_file_header(fileName):
+    filelist.append(fileName)
+
+    file_content = read_file(fileName)
+    new_year_content, year_line, header_end_line = get_year_content(file_content)
+
+    new_file_content = new_content_write_back(file_content, new_year_content, year_line, header_end_line)
+
     new_file_content = check_and_correct_tail(new_file_content)[0]
-    write2file(fileName, new_file_content, True)
+
+    dst_path = os.path.join(os.path.dirname(fileName), os.pardir, "new", os.path.basename(fileName))
+    write2file(dst_path, new_file_content, True)
 
 
 if __name__ == "__main__":
-    path = r"C:\WorkSpace\Programming\python\Python_Work\python\format_header_tail\header"
+    path = r"C:\WorkSpace\Programming\python\Python_Work\python\format_header_tail\replace_µm"
 
-    # 获取所有的.h和.c文件，并分别放在一个列表里
-    print("1. Get all .h and .c file list...")
-    h_file_list, c_file_list = get_file_list(path)
-    print("-------------------------------")
-    for file_list in get_file_list(path):
+    file_types = ["*.h", "*.c"]
+    for file_type in file_types:
+        # 获取所有的.h和.c文件，并分别放在一个列表里
+        print("1. Get all .h and .c file list...")
+        file_list = get_file_list(path, file_type)
+
+        print("-------------------------------")
         # 目标文件转换为utf-8编码格式
         print("2. Covert files to utf-8 encoding...")
         covert2utf8(file_list)
@@ -124,7 +118,6 @@ if __name__ == "__main__":
         final_files = check_header_exist(file_list)
         write2file("final_files.txt", final_files)
         print("-------------------------------")
-
         # 挑选出copyright检查不否规格的文件
         print("4. Filter out files that copyright checked is not correct...")
         checked_failed_files = []
@@ -162,4 +155,4 @@ if __name__ == "__main__":
                 update_file_header(fl)
         print("-------------------------------")
 
-        print("Done")
+    print("Done")

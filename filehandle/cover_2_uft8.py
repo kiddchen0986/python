@@ -48,7 +48,7 @@ def convert_encode2utf8(file, original_encode, des_encode):
 
 
 def covert2utf8(Filelist):
-    # Filelist = get_filelist(path)
+    # Filelist = get_filelist(Filelist)
     for filename in Filelist:
         file_content = read_file(filename)
         encode_info = get_encode_info(filename)
@@ -58,5 +58,5 @@ def covert2utf8(Filelist):
 
 
 # if __name__ == "__main__":
-#     Path = r'E:\WorkSpace\Python\python_work\python\file_practice\.h'
+#     Path = r'C:\WorkSpace\Programming\python\Python_Work\python\format_header_tail\header\*.h'
 #     covert2utf8(Path)
