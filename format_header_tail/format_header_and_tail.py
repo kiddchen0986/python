@@ -4,7 +4,7 @@ from filehandle.cover_2_uft8 import *
 from filehandle.get_file_list import *
 from filehandle.read_write_operator import *
 
-write_file()
+
 def check_header_exist(file_list):
     final_files = []
     for fileName in file_list:
@@ -99,7 +99,7 @@ def update_file_header(fileName):
     new_file_content = check_and_correct_tail(new_file_content)[0]
 
     dst_path = os.path.join(os.path.dirname(fileName), os.pardir, "new", os.path.basename(fileName))
-    write2file(dst_path, new_file_content, True)
+    write_file(dst_path, new_file_content, True)
 
 
 if __name__ == "__main__":
@@ -119,7 +119,7 @@ if __name__ == "__main__":
         # 检查文件是否有copyright，即只针对已有copyright的头文件做处理
         print("3. Check if header is existed...")
         final_files = check_header_exist(file_list)
-        write2file("final_files.txt", final_files)
+        write_file("final_files.txt", final_files)
         print("-------------------------------")
         # 挑选出copyright检查不否规格的文件
         print("4. Filter out files that copyright checked is not correct...")
@@ -127,7 +127,7 @@ if __name__ == "__main__":
         for fileName in final_files:
             if checkFile(fileName) != '':
                 checked_failed_files.append(checkFile(fileName))
-        write2file("copyright_checked_failed_files.txt", checked_failed_files)
+        write_file("copyright_checked_failed_files.txt", checked_failed_files)
 
         print(len(checked_failed_files), checked_failed_files)
         print("-------------------------------")
@@ -146,7 +146,7 @@ if __name__ == "__main__":
         for file in final_files:
             if file not in checked_failed_files:
                 checked_passed_files.append(file)
-        write2file("copyright_checked_passed_files.txt", checked_passed_files)
+        write_file("copyright_checked_passed_files.txt", checked_passed_files)
         print("Get the check passed files".format(checked_passed_files))
         print("-------------------------------")
 

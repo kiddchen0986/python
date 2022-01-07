@@ -6,7 +6,7 @@ def read_file(file):
         return f.readlines()
 
 
-def write2file(file_name, lines, new_line=False):
+def write_file(file_name, lines, new_line=False):
     with open(file_name, mode='w') as fw:
         if new_line:
             fw.writelines(lines)
@@ -14,8 +14,11 @@ def write2file(file_name, lines, new_line=False):
             fw.writelines("\n".join(sorted(lines)))
 
 
-# def create_txt_files(file_name, files):
-#     print("{} file number: {} ".format(file_name[0], str(len(files))))
-#     with open(file_name + ".txt", mode="w") as fw:
-#         for file in sorted(files):
-#             fw.write(file+"\n")
+def read_binary_file(file):
+    with open(file, 'rb') as f:
+        return f.read()
+
+
+def write_binary_file(content, file):
+    with open(file, 'wb') as f:
+        f.write(content)

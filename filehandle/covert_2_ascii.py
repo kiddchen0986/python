@@ -41,7 +41,7 @@ try:
                 print('convert {} to {}'.format('ÃŽÂ¼V', 'uV'))
             new_file_content.append(content)
 
-        write2file(file, new_file_content, True)
+        write_file(file, new_file_content, True)
 except UnicodeDecodeError as e:
     print("{} raised error {}".format(file, e))
 

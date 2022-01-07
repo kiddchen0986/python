@@ -1,19 +1,8 @@
 import os
 #files = os.listdir(".")#获取当前目录下的文件
 from chardet.universaldetector import UniversalDetector
-
-
-def get_filelist(path):
-    Filelist = []
-    for home, dirs, files in os.walk(path):
-        for filename in files:
-            # 文件名列表，包含完整路径
-            if ".h" in filename:
-                Filelist.append(os.path.join(home, filename))
-            # # 文件名列表，只包含文件名
-            # Filelist.append( filename)
-
-    return Filelist
+from filehandle.get_file_list import *
+from filehandle.read_write_operator import read_binary_file, write_binary_file
 
 
 def get_encode_info(file):
@@ -27,30 +16,19 @@ def get_encode_info(file):
         return detector.result['encoding']
 
 
-def read_file(file):
-    with open(file, 'rb') as f:
-        return f.read()
-
-
-def write_file(content, file):
-    with open(file, 'wb') as f:
-        f.write(content)
-
-
 def convert_encode2utf8(file, original_encode, des_encode):
     try:
-        file_content = read_file(file)
+        file_content = read_binary_file(file)
         file_decode = file_content.decode(original_encode, 'ignore')
         file_encode = file_decode.encode(des_encode)
-        write_file(file_encode, file)
+        write_binary_file(file_encode, file)
     except TypeError as e:
         print("{} raise error {}".format(file, e))
 
 
 def covert2utf8(Filelist):
-    # Filelist = get_filelist(Filelist)
     for filename in Filelist:
-        file_content = read_file(filename)
+        file_content = read_binary_file(filename)
         encode_info = get_encode_info(filename)
         if encode_info != 'utf-8':
             convert_encode2utf8(filename, encode_info, 'utf-8')
@@ -58,5 +36,8 @@ def covert2utf8(Filelist):
 
 
 # if __name__ == "__main__":
-#     Path = r'C:\WorkSpace\Programming\python\Python_Work\python\format_header_tail\header\*.h'
-#     covert2utf8(Path)
+#     path = r'C:\WorkSpace\Programming\python\Python_Work\python\format_header_tail\testfiles'
+#     file_types = ["*.h"]   # add more file type into this list
+#     for file_type in file_types:
+#         file_list = get_file_list(path, file_type)
+#         covert2utf8(file_list)
