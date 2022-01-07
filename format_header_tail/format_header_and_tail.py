@@ -4,7 +4,7 @@ from filehandle.cover_2_uft8 import *
 from filehandle.get_file_list import *
 from filehandle.read_write_operator import *
 
-
+write_file()
 def check_header_exist(file_list):
     final_files = []
     for fileName in file_list:
@@ -36,36 +36,40 @@ def check_and_correct_tail(file_content):
     return [file_content, corrected]
 
 
-def get_year_content(file_content):
-    type1_flag, type2_flag = False, False
-    if str(file_content[0]).strip() != "//":
-        pattern = "\* Copyright\s*\(c\) (20\d\d)?(-20\d\d)? Fingerprint Cards AB <tech@fingerprints.com>"
-        type1_flag = True
-    else:
-        pattern = "// Copyright\s*\(c\) (20\d\d)?(-20\d\d)? Fingerprint Cards AB <tech@fingerprints.com>"
-        type2_flag = True
+def get_year_content(fileName):
+    try:
+        file_content = read_file(fileName)
+        type1_flag, type2_flag = False, False
+        if str(file_content[0]).strip() != "//":
+            pattern = "\* Copyright\s*\(c\) (20\d\d)?(-20\d\d)? Fingerprint Cards AB <tech@fingerprints.com>"
+            type1_flag = True
+        else:
+            pattern = "// Copyright\s*\(c\) (20\d\d)?(-20\d\d)? Fingerprint Cards AB <tech@fingerprints.com>"
+            type2_flag = True
 
-    for line, content in enumerate(file_content):
-        if r"Fingerprint Cards AB <tech@fingerprints.com>" in content:
-            year_line = line
-            year_data = re.findall(pattern, file_content[line].strip())
-            if len(year_data) != 0 and len(year_data[0]) != 0:
-                if type1_flag:
-                    new_year_content = " * Copyright (c) {}-2022 Fingerprint Cards AB <tech@fingerprints.com>\n".format(
-                        year_data[0][0])
-                elif type2_flag:
-                    new_year_content = "// Copyright (c) {}-2022 Fingerprint Cards AB <tech@fingerprints.com>\n".format(
-                        year_data[0][0])
-            else:
-                sys.exit("Please manually check if the file {} is correct header\n".format(fileName))
+        for line, content in enumerate(file_content):
+            if r"Fingerprint Cards AB <tech@fingerprints.com>" in content:
+                year_line = line
+                year_data = re.findall(pattern, file_content[line].strip())
+                if len(year_data) != 0 and len(year_data[0]) != 0:
+                    if type1_flag:
+                        new_year_content = " * Copyright (c) {}-2022 Fingerprint Cards AB <tech@fingerprints.com>\n".format(
+                            year_data[0][0])
+                    elif type2_flag:
+                        new_year_content = "// Copyright (c) {}-2022 Fingerprint Cards AB <tech@fingerprints.com>\n".format(
+                            year_data[0][0])
 
-        if r"*/" in str(content).strip()[:3] or r"//" in str(content).strip()[:3]:
-            header_end_line = line
-            break
-    return new_year_content, year_line, header_end_line
+            if line > 1 and (r"*/" in str(content).strip()[:3] or r"//" == str(content).strip()):
+                header_end_line = line
+                break
+        print(fileName)
+        return new_year_content, year_line, header_end_line
+    except UnboundLocalError as e:
+        print("{} raised error {}".format(fileName, e))
 
 
-def new_content_write_back(file_content, new_year_content, year_line, header_end_line):
+def new_content_write_back(fileName, new_year_content, year_line, header_end_line):
+    file_content = read_file(fileName)
     new_file_content = []
     for i in range(len(file_content)):
         if i <= header_end_line:
@@ -88,10 +92,9 @@ def new_content_write_back(file_content, new_year_content, year_line, header_end
 def update_file_header(fileName):
     filelist.append(fileName)
 
-    file_content = read_file(fileName)
-    new_year_content, year_line, header_end_line = get_year_content(file_content)
+    new_year_content, year_line, header_end_line = get_year_content(fileName)
 
-    new_file_content = new_content_write_back(file_content, new_year_content, year_line, header_end_line)
+    new_file_content = new_content_write_back(fileName, new_year_content, year_line, header_end_line)
 
     new_file_content = check_and_correct_tail(new_file_content)[0]
 
@@ -100,7 +103,7 @@ def update_file_header(fileName):
 
 
 if __name__ == "__main__":
-    path = r"C:\WorkSpace\Programming\python\Python_Work\python\format_header_tail\replace_µm"
+    path = r"C:\WorkSpace\Programming\python\Python_Work\python\format_header_tail\testfiles"
 
     file_types = ["*.h", "*.c"]
     for file_type in file_types:
