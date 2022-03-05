@@ -1,5 +1,5 @@
 import os
-#files = os.listdir(".")#获取当前目录下的文件
+import sys
 from chardet.universaldetector import UniversalDetector
 from filehandle.get_file_list import *
 from filehandle.read_write_operator import read_binary_file, write_binary_file
@@ -35,9 +35,21 @@ def covert2utf8(Filelist):
         encode_info = get_encode_info(filename)
 
 
-# if __name__ == "__main__":
-#     path = r'C:\WorkSpace\Programming\python\Python_Work\python\format_header_tail\testfiles'
-#     file_types = ["*.h"]   # add more file type into this list
-#     for file_type in file_types:
-#         file_list = get_file_list(path, file_type)
-#         covert2utf8(file_list)
+def main(argv):
+    if len(argv) == 1:
+        print("No input src directory, exiting")
+        sys.exit(-1)
+
+    if len(argv) == 3:
+        print("Too many input manifests, exiting")
+        sys.exit(-1)
+
+    path = argv[1]
+    file_types = ["*.h", "*.c",  "*.cpp", "*.cs"]   # available to add more file type into this list
+    for file_type in file_types:
+        file_list = get_file_list(path, file_type)
+        covert2utf8(file_list)
+
+
+if __name__ == "__main__":
+    main(sys.argv)
