@@ -1,4 +1,4 @@
-from filehandle.read_write_operator import *
+from file_handle.read_write_operator import *
 from glob import glob
 
 

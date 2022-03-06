@@ -1,6 +1,6 @@
 import os
-from filehandle.get_file_list import *
-from filehandle.read_write_operator import *
+from file_handle.get_file_list import *
+from file_handle.read_write_operator import *
 
 
 path = r"C:\WorkSpace\Programming\python\Python_Work\python\format_header_tail\testfiles"

@@ -1,8 +1,8 @@
 from glob import glob
 from test_copyright_headers import *
-from filehandle.cover_2_uft8 import *
-from filehandle.get_file_list import *
-from filehandle.read_write_operator import *
+from file_handle.cover_2_uft8 import *
+from file_handle.get_file_list import *
+from file_handle.read_write_operator import *
 
 
 def check_header_exist(file_list):

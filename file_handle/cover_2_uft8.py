@@ -1,8 +1,8 @@
 import os
 import sys
 from chardet.universaldetector import UniversalDetector
-from filehandle.get_file_list import *
-from filehandle.read_write_operator import read_binary_file, write_binary_file
+from file_handle.get_file_list import *
+from file_handle.read_write_operator import read_binary_file, write_binary_file
 
 
 def get_encode_info(file):
