@@ -3,20 +3,26 @@ import shutil
 
 
 def move_files(foldername):
-    for drive in ["c:\\", "e:\\"]:
-        if os.path.exists(drive):
-            for dir in os.listdir(drive):
-                if "workspace" == dir.lower():
-                    if ".ssh" in os.listdir(os.path.join(drive, dir)):
-                        for file in os.listdir(os.path.join(drive, dir, ".ssh", foldername)):
-                            if file == ".gitconfig":
-                                shutil.copy(os.path.join(drive, dir, ".ssh", foldername, file), os.path.join(drive, dir))
-                            else:
-                                shutil.copy(os.path.join(drive, dir, ".ssh", foldername, file), os.path.join(drive, dir, ".ssh"))
-                        break
-                    else:
-                        print("Don't have the .ssh folder")
-    print("Files in {} copy finished!".format(foldername))
+    try:
+        for drive in ["c:\\", "e:\\"]:
+            if os.path.exists(drive):
+                for dir in os.listdir(drive):
+                    if "workspace" == dir.lower():
+                        if ".ssh" in os.listdir(os.path.join(drive, dir)):
+                            for file in os.listdir(os.path.join("license", foldername.lower())):
+                                if os.path.isfile(os.path.join("license", foldername.lower(), file)):
+                                    print("Copying {}".format(file))
+                                    if ".gitconfig" == file:
+                                        shutil.copy(os.path.join("license", foldername, file), os.path.join(drive, dir))
+                                    else:
+                                        shutil.copy(os.path.join("license", foldername, file),
+                                                    os.path.join(drive, dir, ".ssh"))
+                            break
+                        else:
+                            print("Don't have the .ssh folder")
+    except FileNotFoundError as e:
+        print("{} not found error".format(e))
+    print("Files in {} folder are copied finished!".format(foldername))
 
 
 if __name__ == "__main__":
