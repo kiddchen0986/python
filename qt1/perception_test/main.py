@@ -1,7 +1,7 @@
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtGui
 from PyQt5.QtCore import pyqtSignal, QThread, pyqtSlot
-from PyQt5.QtWidgets import QWidget, QMainWindow, QApplication
-from qt1.ui_mainwindow import Ui_MainWindow
+from PyQt5.QtWidgets import QMainWindow, QApplication
+from qt1.perception_test.ui_mainwindow import Ui_MainWindow
 import sys
 import os
 import time
@@ -21,7 +21,7 @@ class MyThread(QThread):
         进行任务操作，主要的逻辑操作，返回结果
         """
 
-        for pic in os.listdir('.'):
+        for pic in os.listdir('..'):
             if pic.endswith('jpg') or pic.endswith('png'):
                 self.signal.emit(QtGui.QPixmap(pic))
                 time.sleep(1)
